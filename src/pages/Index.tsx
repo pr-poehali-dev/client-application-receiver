@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import SupportChat from '@/components/SupportChat';
 
 type Status = 'new' | 'progress' | 'done' | 'rejected';
 
@@ -49,6 +50,7 @@ const chartData = [
 const Index = () => {
   const [requests, setRequests] = useState<Request[]>(initialRequests);
   const [form, setForm] = useState({ title: '', type: '', desc: '' });
+  const [chatOpen, setChatOpen] = useState(false);
 
   const stats = {
     total: requests.length,
@@ -192,7 +194,7 @@ const Index = () => {
               <p className="mt-2 text-sm text-primary-foreground/70">
                 Наши специалисты на связи в будни с 9:00 до 20:00
               </p>
-              <Button variant="secondary" className="mt-4 w-full">
+              <Button variant="secondary" className="mt-4 w-full" onClick={() => setChatOpen(true)}>
                 <Icon name="MessageCircle" size={16} className="mr-2" />
                 Открыть чат
               </Button>
@@ -279,6 +281,17 @@ const Index = () => {
           © 2026 EM Group Технолоджи · Все обращения обрабатываются в течение 24 часов
         </div>
       </footer>
+
+      {/* Floating chat trigger */}
+      {!chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+        >
+          <Icon name="MessageCircle" size={24} />
+        </button>
+      )}
+      <SupportChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 };
