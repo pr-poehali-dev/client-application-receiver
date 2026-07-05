@@ -81,7 +81,7 @@ const Index = () => {
               <Icon name="Layers" size={20} className="text-primary-foreground" />
             </div>
             <div>
-              <p className="text-sm font-semibold leading-none">Клиентский портал</p>
+              <p className="text-sm font-semibold leading-none">EM Group Технолоджи</p>
               <p className="text-xs text-muted-foreground">Управление заявками</p>
             </div>
           </div>
@@ -276,7 +276,7 @@ const Index = () => {
 
       <footer className="border-t border-border py-6">
         <div className="container px-4 text-center text-sm text-muted-foreground">
-          © 2026 Клиентский портал · Все обращения обрабатываются в течение 24 часов
+          © 2026 EM Group Технолоджи · Все обращения обрабатываются в течение 24 часов
         </div>
       </footer>
     </div>
