@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import func2url from '../../func2url.json';
+import func2url from '../../backend/func2url.json';
 
 interface Message {
   role: 'user' | 'assistant';

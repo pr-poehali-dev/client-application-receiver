@@ -28,14 +28,18 @@ interface Request {
   type: string;
   date: string;
   status: Status;
+  assignee: string;
 }
 
 const initialRequests: Request[] = [
-  { id: 'ЗК-1043', title: 'Расширение тарифного плана', type: 'Продажи', date: '04.07.2026', status: 'progress' },
-  { id: 'ЗК-1039', title: 'Настройка интеграции с 1С', type: 'Техподдержка', date: '02.07.2026', status: 'new' },
-  { id: 'ЗК-1031', title: 'Возврат средств по счёту №8842', type: 'Финансы', date: '28.06.2026', status: 'done' },
-  { id: 'ЗК-1024', title: 'Консультация по договору', type: 'Юридический', date: '21.06.2026', status: 'done' },
-  { id: 'ЗК-1018', title: 'Замена оборудования на складе', type: 'Логистика', date: '15.06.2026', status: 'rejected' },
+  { id: 'ЗК-1043', title: 'Расширение тарифного плана', type: 'Продажи', date: '04.07.2026', status: 'progress', assignee: 'Игорь Смирнов' },
+  { id: 'ЗК-1039', title: 'Настройка интеграции с 1С', type: 'Техподдержка', date: '02.07.2026', status: 'new', assignee: 'Дарья Волкова' },
+  { id: 'ЗК-1031', title: 'Возврат средств по счёту №8842', type: 'Финансы', date: '28.06.2026', status: 'done', assignee: 'Игорь Смирнов' },
+  { id: 'ЗК-1024', title: 'Консультация по договору', type: 'Юридический', date: '21.06.2026', status: 'done', assignee: 'Павел Ерёмин' },
+  { id: 'ЗК-1018', title: 'Замена оборудования на складе', type: 'Логистика', date: '15.06.2026', status: 'rejected', assignee: 'Дарья Волкова' },
+  { id: 'ЗК-1012', title: 'Настройка кассового оборудования', type: 'Техподдержка', date: '10.06.2026', status: 'done', assignee: 'Павел Ерёмин' },
+  { id: 'ЗК-1005', title: 'Проверка отчётности за квартал', type: 'Финансы', date: '02.06.2026', status: 'done', assignee: 'Игорь Смирнов' },
+  { id: 'ЗК-0998', title: 'Обновление ПО на терминалах', type: 'Техподдержка', date: '27.05.2026', status: 'progress', assignee: 'Дарья Волкова' },
 ];
 
 const chartData = [
@@ -60,6 +64,20 @@ const Index = () => {
 
   const maxV = Math.max(...chartData.map((d) => d.v));
 
+  const techStats = Object.values(
+    requests.reduce<Record<string, { name: string; total: number; done: number; progress: number }>>((acc, r) => {
+      if (r.assignee === '—') return acc;
+      if (!acc[r.assignee]) acc[r.assignee] = { name: r.assignee, total: 0, done: 0, progress: 0 };
+      acc[r.assignee].total += 1;
+      if (r.status === 'done') acc[r.assignee].done += 1;
+      if (r.status === 'progress' || r.status === 'new') acc[r.assignee].progress += 1;
+      return acc;
+    }, {})
+  ).sort((a, b) => b.total - a.total);
+
+  const initials = (name: string) =>
+    name.split(' ').map((p) => p[0]).join('').toUpperCase();
+
   const submit = () => {
     if (!form.title || !form.type) return;
     const newReq: Request = {
@@ -68,6 +86,7 @@ const Index = () => {
       type: form.type,
       date: '05.07.2026',
       status: 'new',
+      assignee: '—',
     };
     setRequests([newReq, ...requests]);
     setForm({ title: '', type: '', desc: '' });
@@ -255,6 +274,12 @@ const Index = () => {
                           <span className="font-mono text-xs text-muted-foreground">{r.id}</span>
                           <span className="text-xs text-muted-foreground">·</span>
                           <span className="text-xs text-muted-foreground">{r.type}</span>
+                          {r.assignee !== '—' && (
+                            <>
+                              <span className="text-xs text-muted-foreground">·</span>
+                              <span className="text-xs text-muted-foreground">{r.assignee}</span>
+                            </>
+                          )}
                         </div>
                         <p className="mt-0.5 truncate font-medium">{r.title}</p>
                       </div>
@@ -266,6 +291,49 @@ const Index = () => {
                           <span className={`h-1.5 w-1.5 rounded-full ${m.dot}`} />
                           {m.label}
                         </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Tech stats */}
+            <div className="rounded-lg border border-border bg-card shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border px-6 py-4">
+                <Icon name="Users" size={18} className="text-primary" />
+                <h2 className="font-semibold">Статистика по техникам</h2>
+              </div>
+              <div className="divide-y divide-border">
+                {techStats.map((t, i) => {
+                  const rate = t.total ? Math.round((t.done / t.total) * 100) : 0;
+                  return (
+                    <div
+                      key={t.name}
+                      className="animate-fade-in px-6 py-4"
+                      style={{ animationDelay: `${i * 80}ms` }}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-primary">
+                            {initials(t.name)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">{t.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Всего: {t.total} · В работе: {t.progress} · Выполнено: {t.done}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                          {rate}% выполнено
+                        </span>
+                      </div>
+                      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div
+                          className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                          style={{ width: `${rate}%` }}
+                        />
                       </div>
                     </div>
                   );
